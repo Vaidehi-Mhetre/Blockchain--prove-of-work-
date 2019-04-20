@@ -1,0 +1,291 @@
+import java.util.Random;
+
+public class prove_of_work {
+
+	public static char alphabet[]  = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+        'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+        'w', 'x', 'y', 'z',' '};
+        
+	public static String permissible_char =  "abcdefghijklmnopqrstuvwxyz";
+	static int block2[][]= new int [5][5];
+	static int[][] block3= new int[5][5];
+	
+	//map alphabet to corresponding integers
+	public static int[] mapinput(String input, char[] alphabet)
+    {
+        int map[] = new int[(input.length())];
+        
+        
+        for (int i = 0; i < input.length(); i++)
+        {
+            for (int j = 0; j <= 26; j++)
+            {
+                if (alphabet[j] == input.charAt(i))
+                {
+                	
+                	  map[i] = j;
+                    break;
+                }
+            }
+        }
+        return (map);
+    }
+	
+  //Method for round 1 of hashing
+	public static int[] Round1(String input, char[] alphabet)
+    {
+		
+		
+		    //Convert input into matrix
+		    char block1[][]= new char [5][5];
+		    for(int i=0;i<5;i++)
+		    {
+			      for(int j=0;j<5;j++)
+			      {
+				        block1[i][j]= input.charAt(5*i+j);
+			      }
+		    }
+		
+	    	//Calculate the mapped numbers matrix
+		    int[] map=new int[input.length()];
+	    	map=mapinput(input,alphabet);
+		
+		    for(int i=0;i<5;i++)
+		    {
+			      for(int j=0;j<5;j++)
+			      {
+				        block2[i][j]= map[5*i+j];
+			      }
+		    }
+		
+		    //Calculate out array
+		    int [] Out = {0,0,0,0,0};
+		    for(int j=0;j<5;j++)
+		    {
+			      int a=0;
+		        for(int i =0; i<5; i++)
+		        {
+			
+			          a+= block2[i][j];
+			          Out[j]= a%27;
+		        }
+		
+		      }
+	
+		return Out;
+    }
+	
+  //method for round 2 of hashing
+	public static int[] Round2 (int[] Out, int[][] block2)
+    {
+		int[] out2 = {0,0,0,0,0};
+		int n=5;
+		int d=1;
+		
+		
+		//Matrix row shifting
+		for(int i=0;i<4;i++)
+		{
+			int[] temp = new int[5];
+			for(int j=0;j<5;j++)
+			{
+			  temp[(j-d+n)%n] =block2[i][j] ;
+			}
+			for(int j=0;j<5;j++)
+			{
+				block3[i][j]= temp[j];
+			}
+			d++;
+		}
+		int i=4;
+		for(int j=0;j<5;j++)
+		{
+			block3[i][j]= block2[i][j];
+		}
+	
+		
+		
+		//Calculate out  for round 2
+		for(int j=0;j<5;j++)
+		{
+			 int a=0;
+		for(int y =0; y<5; y++)
+		{
+			
+			 a+= block3[y][j];
+			 out2[j]= a%27;
+		}
+		
+		}
+		int[] out3= new int[5];
+		
+		for(int y=0;y<5;y++)
+		{
+			out3[y]= (Out[y]+out2[y])%27;
+		}
+		
+	
+		
+		
+		return out3;
+    }
+    
+  /method for round 3 for hashing
+	public static int[] Round3 (int[] out3)
+    {
+		int[] out4 = {0,0,0,0,0};
+		int n=5;
+		int d=1;
+		int[] [] block4= new int[5][5];
+		//Matrix column shifting
+		for(int i=0;i<5;i++)
+		{
+			int[] temp = new int[5];
+			for(int j=0;j<5;j++)
+			{
+			  temp[(j-d+n)%n] =block2[j][i] ;
+			}
+			
+			int t1=0;
+			int swap=3;
+			for(int j=0;j<2;j++)
+			{
+				
+				t1=temp[j];
+				temp[j]=temp[j+swap];
+				temp[j+swap]=t1;
+				swap= swap-2;
+			}
+			for(int j=0;j<5;j++)
+			{
+				block4[i][j]= temp[j];
+			}
+			d++;
+		}
+		int i=4;
+		for(int j=0;j<5;j++)
+		{
+			block4[j][i]= block3[j][i];
+		}
+		
+		
+				//Calculate out for round 3
+				for(int j=0;j<5;j++)
+				{
+					 int a=0;
+				for(int y =0; y<5; y++)
+				{
+					
+					 a+= block4[j][y];
+					 out4[j]= a%27;
+				}
+				
+				}
+				
+				
+				int[] out5={0,0,0,0,0};
+				for(int y=0;y<5;y++)
+				{
+					out5[y]= (out3[y]+out4[y])%27;
+				}
+				
+			
+				
+		return out5;
+    }
+	
+  //generete random string of 25 characters as nonce
+	 public static String random_nonce_generator()
+	    {
+		 	Random r = new Random();
+		 	int N=permissible_char.length();
+		 	String nonce="";
+		 	for (int i = 0; i < 25; i++) 
+	        
+		 		nonce+=permissible_char.charAt(r.nextInt(N));
+	    
+	 	return nonce;
+	    }
+	
+	public static void main(String[] args)
+	{
+		
+		
+		String name="vaidehimhetre";
+		System.out.println(" Full name is "+ name);
+		
+		
+		if(name.length()%25 !=0)
+		{
+			for(int i=0;i<name.length()%25;i++)
+			{
+				name+=" " ;
+			}
+		}
+		String s="";
+		String nonce="";
+		int count=0;
+		int a=0;
+		while(a == 0)
+		{
+			count++;
+			s="";
+		nonce= random_nonce_generator();
+		String input= name+nonce;
+		
+		//System.out.print("the input length is"+input.length());
+		//convert input into block of 25
+				String p1="";
+				String p2="";
+				
+				for(int i=0; i<25; i++ )
+					p1+= input.charAt(i);
+				for(int i=25;i<50;i++)
+					p2+=input.charAt(i);
+		
+		
+					
+		int[] out_Block = new int[5];
+		int[] out_R1_1,out_R1_2= new int[5];
+		//Round 1
+		//System.out.println("\n\n***Rounds for BLOCK 1******");
+		out_R1_1=Round1(p1,alphabet);
+		
+		int[] out_R2_1,out_R2_2= new int[5];
+		out_R2_1=Round2(out_R1_1,block2);
+		
+		int[] out_R3_1,out_R3_2= new int[5];
+		out_R3_1=Round3(out_R2_1);
+		
+		//System.out.println("\n\n***Rounds for BLOCK 2******");
+		out_R1_2=Round1(p2,alphabet);
+		out_R2_2=Round2(out_R1_2,block2);
+		out_R3_2=Round3(out_R2_2);
+		
+		for(int y=0;y<5;y++)
+		{
+			out_Block[y]= (out_R3_1[y]+out_R3_2[y])%27;
+		}
+		
+		char[] hash= new char[5];
+		for(int i=0;i<5;i++)
+		{
+			hash[i]=alphabet[out_Block[i]];
+		}
+		
+		
+		for(int i=0;i<5;i++)
+			s+=(hash[i]);
+		String sub =s.substring(0,2);
+
+		if(sub.equals("aa"))
+		{a=1;
+		 break;
+		}
+		}
+		System.out.println("\n The output of hash function with leading aa is : "+s);
+		System.out.println("\n The nonce is : "+nonce);
+		System.out.println("\n The count of strings tried is : "+count);
+		
+	}
+}
