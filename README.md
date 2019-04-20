@@ -1,0 +1,2 @@
+# Blockchain--prove-of-work-
+Using a hash function, “prove of work” is done as follows. Suppose the hash function is H() and your full name is NAME. This program finds a random string NONCE with 25 characters such that the output of H(NAME||NONCE) has at least 2 leading “a”, i.e., the output is aa ∗∗∗, where ∗ can be any character. The program also output the number of random strings tried. If your full name is less than 25 characters, then some spaces are used as padding.
